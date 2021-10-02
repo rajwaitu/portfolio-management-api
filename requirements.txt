@@ -1,0 +1,12 @@
+qddate
+requests
+pandas
+scipy
+SQLAlchemy
+fastapi
+pymysql
+feedparser
+pymongo
+mftool
+gunicorn
+uvicorn
