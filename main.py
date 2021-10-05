@@ -45,11 +45,9 @@ def getUserHolding(email,portfolio_id):
 def getUserInvestment(email,portfolio_id):
     return investmentservice.getInvestment(email,portfolio_id)
 
-'''
 @app.post("/v1/api/user/{email}/portfolio/{portfolio_id}/investment")
 def createUserInvestment(email,portfolio_id):
     return investmentservice.createInvestment(email,portfolio_id)
-'''
 
 @app.get("/v1/api/user/{email}/watchlist")
 def getUserWatchlist(email):

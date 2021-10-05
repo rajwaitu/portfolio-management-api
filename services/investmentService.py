@@ -29,39 +29,24 @@ def getInvestment(email,portfolioId):
       raise APIError(statusCode = 400, message = 'error occured while loading investments' )
 
 # this can be a job
-'''
-def createInvestment(email,portfolioId):
-    
+
+def createInvestment(email,portfolioId): 
     try:
-      user = db.getUserByEmail(email)
-      if user == None:
-          #raise APIError(400,'No user registered with given email')
-          return {'error' : "No user registered with given email"}
+      get_holding_url = datalakeAPI.GET_HOLDING_API.format(email,portfolioId)
+      create_investment_url = datalakeAPI.CREATE_INVESTMENT_API.format(email,portfolioId)
 
-      user_portfolio = db.getUserPortfolioById(int(portfolioId))
-      if user_portfolio == None:
-          #raise APIError(400,'No user portfolio found with given portfolio')
-          return {'error' : "No user portfolio found with given portfolio"}
-      
-      holdingList = db.getHoldingByUserAndUserPortfolio(user.subscription_id,user_portfolio.id)
+      holdingList = requests.get(get_holding_url).json()['holdingList']
 
-      totalInvestment,totalHoldings,netProfit = 0,0,0
-      stockCodes = [ holding.stockCode for holding in holdingList]
+      stockCodes = [ holding['stockCode'] for holding in holdingList]
       stockLTPdict = get_all_stock_ltp(stockCodes)
 
-      for holding in holdingList:
-          totalQTY = holding.holdingQuantity
-          totalInvestment = totalInvestment + int(totalQTY * holding.avaragePrice)
-          totalHoldings = totalHoldings + int(totalQTY * float(stockLTPdict[holding.stockCode]))
+      r = requests.post(create_investment_url, json={"stockLTPs": stockLTPdict})
+      status = r.status_code
+      if status == 200:
+        return {'msg' : 'user investment created successfully!'}
+      else:
+        raise APIError(statusCode = 400, message = 'error occured while creating user investment' )
 
-      netProfit = totalHoldings - totalInvestment
-
-      print('totalInvestment : ' + str(totalInvestment))
-      print('totalHoldings : ' + str(totalHoldings))
-      print('netProfit : ' + str(netProfit))
-     
     except Exception:
       print(traceback.format_exc())
-      #raise APIError(400)
-      return {'error' : "Exception occred while processing the request"}
-'''
+      raise APIError(statusCode = 400, message = 'error occured while creating user investment' )
