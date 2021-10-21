@@ -1,7 +1,7 @@
 import traceback
 import locale
 from sqlalchemy.sql.operators import isnot
-from .stockUtil import get_all_stock_ltp
+from .stockUtil import get_all_stock_ltp,get_stock_depth
 
 def getPortfolioHoldingResponse(holdingList):
     total_investment = 0
@@ -13,6 +13,7 @@ def getPortfolioHoldingResponse(holdingList):
         stockCodes.append(x['stockCode'])
 
     stockLTPdict = get_all_stock_ltp(stockCodes)
+    stockDepthdict = get_stock_depth(stockLTPdict)
 
     for holding in holdingList:
         try:
@@ -39,6 +40,8 @@ def getPortfolioHoldingResponse(holdingList):
          holdingview['currentValue'] = locale.currency(round(holdingValue,2), grouping=True)
          holdingview['profitLoss'] = locale.currency(round(profitLoss,2), grouping=True)
          holdingview['netChange'] = str(round(netChange,2)) + "%"
+         holdingview['maxima'] = stockDepthdict[holding['stockCode']][0]
+         holdingview['depth'] = stockDepthdict[holding['stockCode']][1]
 
          if profitLoss < 0 :
              holdingview['profitLoss'] = '-' + locale.currency(abs(round(profitLoss,2)),grouping=True)

@@ -6,8 +6,12 @@ import random
 import datetime,time
 import logging
 import re
+from nsepy import get_history
+from scipy.signal import argrelmax
+import numpy as np
 import concurrent.futures
 from exception.apiError import APIError
+from utils.datetimeUtil import getDateRange
 
 mode ='local'
 
@@ -88,4 +92,23 @@ def get_all_stock_ltp(symbolList):
     s2 = time.time()
     print("second taken to fetch all LTPs  =",round((s2-s1),2))
     return stockLTPDict
+
+def get_stock_depth(stockLTPdict):
+    dates = getDateRange(6)
+    stockDepthdict = {}
+
+    for key in stockLTPdict.keys():
+        data = get_history(symbol=key,start=dates[1],end=dates[0])
+        close_price_list = data['Close'].tolist()
+        max_price_list= []
+        maxima_indices = argrelmax(np.array(close_price_list))
+        for idx in np.ravel(maxima_indices):
+            max_price_list.append(close_price_list[idx])
+
+        maxima_price = np.array(max_price_list).max()
+        stock_ltp = stockLTPdict[key]
+        depth = round(((maxima_price - stock_ltp)/maxima_price)*100,2)
+        stockDepthdict[key] = (str(maxima_price),str(depth) + '%')
+
+    return stockDepthdict
 

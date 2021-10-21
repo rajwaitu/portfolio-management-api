@@ -12,3 +12,4 @@ gunicorn
 uvicorn
 nsepy
 python-multipart
+python-dateutil
