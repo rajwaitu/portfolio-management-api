@@ -10,3 +10,5 @@ pymongo
 mftool
 gunicorn
 uvicorn
+nsepy
+python-multipart
