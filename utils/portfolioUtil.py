@@ -1,7 +1,8 @@
 import traceback
 import locale
-from sqlalchemy.sql.operators import isnot
-from .stockUtil import get_all_stock_ltp,get_stock_depth
+
+import config.app_env as env
+from .stockUtil import get_all_stock_ltp
 
 def getPortfolioHoldingResponse(holdingList):
     total_investment = 0
@@ -12,14 +13,18 @@ def getPortfolioHoldingResponse(holdingList):
     for x in holdingList:
         stockCodes.append(x['stockCode'])
 
-    stockLTPdict = get_all_stock_ltp(stockCodes)
-    stockDepthdict = get_stock_depth(stockLTPdict)
+    if(env.real_time_ltp == True):
+        stockLTPdict = get_all_stock_ltp(stockCodes)
 
     for holding in holdingList:
         try:
-         holding_qty = holding['holdingQuantity'] 
-         #stock_ltp = get_stock_ltp(holding.stockCode)
-         stock_ltp = stockLTPdict[holding['stockCode']]
+         holding_qty = holding['holdingQuantity']
+
+         if(env.real_time_ltp == True):
+            stock_ltp = stockLTPdict[holding['stockCode']]
+         else:
+             stock_ltp = holding['ltp']
+
          holdingValue = holding_qty * float(stock_ltp)
          investment = holding_qty * holding['avaragePrice']
          profitLoss = holdingValue - investment
@@ -40,8 +45,8 @@ def getPortfolioHoldingResponse(holdingList):
          holdingview['currentValue'] = locale.currency(round(holdingValue,2), grouping=True)
          holdingview['profitLoss'] = locale.currency(round(profitLoss,2), grouping=True)
          holdingview['netChange'] = str(round(netChange,2)) + "%"
-         holdingview['maxima'] = stockDepthdict[holding['stockCode']][0]
-         holdingview['depth'] = stockDepthdict[holding['stockCode']][1]
+         holdingview['maxima'] = str(holding['maxima'])
+         holdingview['depth'] = str(holding['depth']) + "%"
 
          if profitLoss < 0 :
              holdingview['profitLoss'] = '-' + locale.currency(abs(round(profitLoss,2)),grouping=True)

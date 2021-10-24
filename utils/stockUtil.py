@@ -90,12 +90,14 @@ def get_all_stock_ltp(symbolList):
 
 
     s2 = time.time()
-    print("second taken to fetch all LTPs  =",round((s2-s1),2))
+    print("time taken to fetch all LTPs in sec  =",round((s2-s1),2))
     return stockLTPDict
 
 def get_stock_depth(stockLTPdict):
     dates = getDateRange(6)
     stockDepthdict = {}
+
+    s1 = time.time()
 
     for key in stockLTPdict.keys():
         data = get_history(symbol=key,start=dates[1],end=dates[0])
@@ -108,7 +110,9 @@ def get_stock_depth(stockLTPdict):
         maxima_price = np.array(max_price_list).max()
         stock_ltp = stockLTPdict[key]
         depth = round(((maxima_price - stock_ltp)/maxima_price)*100,2)
-        stockDepthdict[key] = (str(maxima_price),str(depth) + '%')
+        stockDepthdict[key] = (maxima_price,depth)
 
+    s2 = time.time()
+    print("time taken to calculate depth  in sec  =",round((s2-s1),2))
     return stockDepthdict
 

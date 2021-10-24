@@ -1,6 +1,7 @@
 # holdingService.py
 import traceback
 import requests
+import time
 import config.data_lake as datalakeAPI
 from exception.apiError import APIError
 from utils.portfolioUtil import getPortfolioHoldingResponse
@@ -8,7 +9,12 @@ from utils.portfolioUtil import getPortfolioHoldingResponse
 def getHolding(email,portfolioId):
     try:
       get_holding_url = datalakeAPI.GET_HOLDING_API.format(email,portfolioId)
+      
+      s1 = time.time()
       holdingList = requests.get(get_holding_url).json()['holdingList']
+      s2 = time.time()
+      print("time taken to fetch holdingList in sec  =",round((s2-s1),2))
+
       return getPortfolioHoldingResponse(holdingList)
     except Exception :
       print(traceback.format_exc())

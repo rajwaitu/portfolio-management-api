@@ -1,14 +1,12 @@
-env = 'prod'
+import config.app_env as env
 
-if env == 'prod':
- GET_HOLDING_API = ''
- GET_INVESTMENT_API = ''
- CREATE_INVESTMENT_API = ''
- GET_WATCHLSIT_API = ''
- GET_USER_PORTFOLIO_API = ''
+if env.data_lake_runtime == 'vm':
+    pass
+ 
 
-elif env == 'local':
+elif env.data_lake_runtime == 'local':
  GET_HOLDING_API = 'http://localhost:8001/v1/api/user/{}/portfolio/{}/holding'
+ CREATE_HOLDING_API = 'http://localhost:8001/v1/api/user/{}/portfolio/{}/holding'
  GET_INVESTMENT_API = 'http://localhost:8001/v1/api/user/{}/portfolio/{}/investment'
  CREATE_INVESTMENT_API = 'http://localhost:8001/v1/api/user/{}/portfolio/{}/investment'
  GET_WATCHLSIT_API = 'http://localhost:8001/v1/api/user/{}/watchlist'
