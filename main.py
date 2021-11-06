@@ -6,6 +6,7 @@ from fastapi import FastAPI,Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from mftool import Mftool
+from pydantic import BaseModel
 
 import services.holdingService as holdingservice
 import services.investmentService as investmentservice
@@ -27,6 +28,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+class HoldingList(BaseModel):
+    holdingList: list
+
 @app.exception_handler(error.APIError)
 async def unicorn_exception_handler(request: Request, exc: error.APIError):
     return JSONResponse(
@@ -41,6 +45,10 @@ def ping():
 @app.get("/v1/api/user/{email}/portfolio/{portfolio_id}/holding")
 def getUserHolding(email,portfolio_id):
     return holdingservice.getHolding(email,portfolio_id)
+
+@app.post("/v1/api/user/{email}/portfolio/{portfolio_id}/holding")
+def createUserHolding(email,portfolio_id,holdingList:HoldingList):
+    return holdingservice.createHolding(email,portfolio_id,holdingList)
 
 @app.get("/v1/api/user/{email}/portfolio/{portfolio_id}/investment")
 def getUserInvestment(email,portfolio_id):

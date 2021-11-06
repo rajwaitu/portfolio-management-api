@@ -5,6 +5,7 @@ import time
 import config.data_lake as datalakeAPI
 from exception.apiError import APIError
 from utils.portfolioUtil import getPortfolioHoldingResponse
+from utils.stockUtil import get_all_stock_ltp
 
 def getHolding(email,portfolioId):
     try:
@@ -19,6 +20,26 @@ def getHolding(email,portfolioId):
     except Exception :
       print(traceback.format_exc())
       raise APIError(statusCode = 400, message = 'error occured while creating holding view' )
+
+def createHolding(email,portfolioId,holdingListObj):
+    try:
+      updatedHoldingList = []
+      stockCodes = []
+
+      for holding in holdingListObj.holdingList:
+        stockCodes.append(holding['scrip'])
+      
+      stockLTPdict = get_all_stock_ltp(stockCodes)
+
+      for x in holdingListObj.holdingList:
+        x['ltp'] = stockLTPdict[x['scrip']]
+        updatedHoldingList.append(x)
+
+      create_holding_url = datalakeAPI.CREATE_HOLDING_API.format(email,portfolioId)
+      return requests.post(create_holding_url, json={"holdingList": updatedHoldingList}).json()
+    except Exception :
+      print(traceback.format_exc())
+      raise APIError(statusCode = 400, message = 'error occured while creating holding' )
 
 def getUserPortfolio(email):
     try:
