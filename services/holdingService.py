@@ -41,6 +41,40 @@ def createHolding(email,portfolioId,holdingListObj):
       print(traceback.format_exc())
       raise APIError(statusCode = 400, message = 'error occured while creating holding' )
 
+def updateHolding(email,portfolioId,holdingListObj):
+    try:
+      updatedHoldingList = []
+      get_holding_url = datalakeAPI.GET_HOLDING_API.format(email,portfolioId)
+      holdingList = requests.get(get_holding_url).json()['holdingList']
+
+      # if id is not in holdingPayload then get id from holdingList
+      for holdingPayload in holdingListObj.holdingList:
+        if "id" not in holdingPayload:
+          scrip = holdingPayload['scrip']
+          for x in holdingList:
+            if x['stockCode'] == scrip:
+              holdingPayload['id'] = x['id']
+              updatedHoldingList.append(holdingPayload)
+              break
+        else:
+          updatedHoldingList.append(holdingPayload)
+
+      create_holding_url = datalakeAPI.CREATE_HOLDING_API.format(email,portfolioId)
+      return requests.put(create_holding_url, json={"holdingList": updatedHoldingList}).json()
+
+    except Exception :
+      print(traceback.format_exc())
+      raise APIError(statusCode = 400, message = 'error occured while updating holding ' )
+
+def deleteHolding(email,portfolioId,scripObj):
+  try:
+      delete_holding_url = datalakeAPI.CREATE_HOLDING_API.format(email,portfolioId)
+      return requests.delete(delete_holding_url, json={"scrip": scripObj.scrip}).json()
+        
+  except Exception :
+      print(traceback.format_exc())
+      raise APIError(statusCode = 400, message = 'error occured while deleting user holdings' )
+
 def getUserPortfolio(email):
     try:
       get_portfolio_url = datalakeAPI.GET_USER_PORTFOLIO_API.format(email)

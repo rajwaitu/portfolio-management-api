@@ -16,7 +16,7 @@ def getPortfolioHoldingResponse(holdingList):
     if(env.real_time_ltp == True):
         stockLTPdict = get_all_stock_ltp(stockCodes)
 
-    for holding in holdingList:
+    for holding in sorted(holdingList,key=lambda x: x['stockCode']):
         try:
          holding_qty = holding['holdingQuantity']
 

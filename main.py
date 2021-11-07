@@ -30,6 +30,8 @@ app.add_middleware(
 
 class HoldingList(BaseModel):
     holdingList: list
+class Scrip(BaseModel):
+    scrip: str
 
 @app.exception_handler(error.APIError)
 async def unicorn_exception_handler(request: Request, exc: error.APIError):
@@ -49,6 +51,14 @@ def getUserHolding(email,portfolio_id):
 @app.post("/v1/api/user/{email}/portfolio/{portfolio_id}/holding")
 def createUserHolding(email,portfolio_id,holdingList:HoldingList):
     return holdingservice.createHolding(email,portfolio_id,holdingList)
+
+@app.put("/v1/api/user/{email}/portfolio/{portfolio_id}/holding")
+def updateUserHolding(email,portfolio_id,holdingList:HoldingList):
+    return holdingservice.updateHolding(email,portfolio_id,holdingList)
+
+@app.delete("/v1/api/user/{email}/portfolio/{portfolio_id}/holding")
+def deleteUserHolding(email,portfolio_id,scrip:Scrip):
+    return holdingservice.deleteHolding(email,portfolio_id,scrip)
 
 @app.get("/v1/api/user/{email}/portfolio/{portfolio_id}/investment")
 def getUserInvestment(email,portfolio_id):
