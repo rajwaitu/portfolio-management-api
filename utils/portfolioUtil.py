@@ -42,6 +42,7 @@ def getPortfolioHoldingResponse(holdingList):
          holdingview['avaragePrice'] = str(holding['avaragePrice'])
          holdingview['lastTradedPrice'] = str(stock_ltp)
          holdingview['investment'] = locale.currency(round(investment,2), grouping=True)
+         holdingview['investmentasnumber'] = round(investment,2)
          holdingview['currentValue'] = locale.currency(round(holdingValue,2), grouping=True)
          holdingview['profitLoss'] = locale.currency(round(profitLoss,2), grouping=True)
          holdingview['netChange'] = str(round(netChange,2)) + "%"
